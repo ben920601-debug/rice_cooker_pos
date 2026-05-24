@@ -1,0 +1,448 @@
+/* style.css */
+/* ==================== 🌾 Rice Cooker Tech Studio 專屬：日系木質米飯主題 ==================== */
+:root {
+    --primary: #e11d48;        /* 改用質感的微醺山茶紅（或 #d97706 琥珀橘），作為主要視覺核心 */
+    --primary-hover: #be123c;
+    --bg-main: #fbf9f4;        /* 溫暖的越光米色，取代原本死板的冷灰色 */
+    --surface: #ffffff;
+    --text: #292524;           /* 深石墨色，比純黑更有日系印刷的無印良品感 */
+    --text-muted: #78716c;     /* 溫和的木質灰 */
+    --border: #eddcd2;         /* 帶有麥芽糖溫暖色調的輕柔邊框線 */
+    --danger: #e11d48;
+    --sidebar-bg: #443e38;     /* 日系深胡桃木色，營造主廚圍裙與實木櫃檯的沉穩感 */
+    --sidebar-active: #2e2a25; /* 側邊欄選中時的深陰影木色 */
+    --login-bg: #2e2a25;
+    
+    /* 🎨 追加：商用高級感核心細節 */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;         /* 圓角放大，讓科技系統多一點圓潤的親和力 */
+    --shadow-sm: 0 2px 8px rgba(68, 62, 56, 0.04);
+    --shadow-md: 0 8px 20px rgba(68, 62, 56, 0.08);
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    touch-action: manipulation; 
+}
+
+body { 
+    background-color: var(--bg-main); 
+    color: var(--text); 
+    display: flex; 
+    height: 100vh; 
+    overflow: hidden; 
+    user-select: none; /* 防止快速點擊時選取到網頁文字變藍 */
+}
+
+/* ==================== 全螢幕登入畫面 Login Page ==================== */
+.login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--login-bg) 0%, #022c22 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* 確保蓋在最上層 */
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* 當登入成功後，隱藏登入大視窗 */
+.login-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.login-header i {
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.login-header h2 {
+    font-size: 1.6rem;
+    color: #111827;
+    margin-bottom: 5px;
+}
+
+.login-header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.input-wrapper input, .input-wrapper select {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+}
+
+.input-wrapper input:focus, .input-wrapper select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.btn-login {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.btn-login:hover { background: var(--primary-hover); }
+.btn-login:active { transform: scale(0.98); }
+
+.login-error {
+    color: var(--danger);
+    font-size: 0.88rem;
+    margin-top: 10px;
+    display: none;
+    font-weight: 500;
+}
+
+/* ==================== 左側功能列 Sidebar ==================== */
+.sidebar {
+    width: 240px;
+    background-color: var(--sidebar-bg);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-brand {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-brand i {
+    margin-right: 10px;
+    font-size: 1.3rem;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 15px 0;
+    flex-grow: 1;
+}
+
+.sidebar-item a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+    margin-bottom: 4px;
+}
+
+.sidebar-item a:hover, .sidebar-item.active a {
+    color: white;
+    background-color: var(--sidebar-active);
+}
+
+.sidebar-item.active a {
+    border-left-color: var(--primary);
+}
+
+.sidebar-item i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.sidebar-footer {
+    padding: 15px 20px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-logout {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+.btn-logout:hover { color: var(--danger); }
+
+/* ==================== 主要內容區大框架 ==================== */
+.main-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 頂部狀態列 */
+.top-navbar {
+    height: 60px;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+/* 實體頁面內容容器 */
+.page-content {
+    flex-grow: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* 預留切換分頁隱藏功能 */
+.app-page {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+.app-page.active {
+    display: flex;
+}
+
+/* ==================== 點餐收銀主頁面 ==================== */
+.pos-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* 中間商品區 */
+.products-section {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.product-card:active { transform: scale(0.95); }
+.product-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: var(--primary);
+}
+
+.product-name { font-weight: bold; font-size: 1.05rem; margin-bottom: 8px; color: var(--text); }
+.product-price { color: var(--primary); font-weight: 600; font-size: 1.1rem; }
+
+/* 右側購物車 */
+.cart-section {
+    width: 360px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.cart-header { padding: 15px 20px; font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.cart-items { flex-grow: 1; overflow-y: auto; padding: 10px 20px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.item-info { display: flex; flex-direction: column; gap: 2px; }
+.item-name { font-weight: 500; }
+.item-meta { font-size: 0.85rem; color: var(--text-muted); }
+
+.item-actions { display: flex; align-items: center; gap: 10px; }
+.btn-qty { border: 1px solid var(--border); background: white; width: 28px; height: 28px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.btn-qty:hover { background: #f9fafb; border-color: #d1d5db; }
+.item-qty { font-weight: 600; width: 20px; text-align: center; }
+
+.cart-summary { padding: 20px; border-top: 1px solid var(--border); background: #f9fafb; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; }
+
+.btn-checkout { background: var(--primary); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+.btn-checkout:hover { background: var(--primary-hover); }
+.btn-checkout:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+#status-bar { padding: 10px 15px; font-size: 0.9rem; text-align: center; border-radius: 6px; margin-bottom: 12px; display: none; font-weight: 500; }
+
+/* ==================== 響應式微調 (RWD) ==================== */
+@media (max-width: 992px) {
+    .sidebar { width: 70px; }
+    .sidebar-brand span, .sidebar-item span, .sidebar-footer span { display: none; }
+    .sidebar-brand i, .sidebar-item i { margin-right: 0; font-size: 1.4rem; }
+    .sidebar-brand { justify-content: center; padding: 0; }
+    .sidebar-item a { justify-content: center; padding: 15px 0; }
+    .sidebar-footer { justify-content: center; padding: 15px 0; }
+}
+
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; flex-direction: row; }
+    .sidebar-brand { display: none; }
+    .sidebar-menu { display: flex; padding: 0; width: 100%; justify-content: space-around; }
+    .sidebar-item a { border-left: none; border-bottom: 3px solid transparent; padding: 15px 20px; margin-bottom: 0; }
+    .sidebar-item.active a { border-bottom-color: var(--primary); }
+    .sidebar-footer { padding: 0 15px; display: flex; align-items: center; }
+    
+    .main-wrapper { height: calc(100vh - 54px); }
+    .top-navbar { display: none; }
+    
+    .pos-container { flex-direction: column; }
+    .cart-section { width: 100%; height: 40%; border-left: none; border-top: 1px solid var(--border); }
+}
+/* 確保商品管理在 flex 佈局下能垂直向下排列 */
+#page-products.app-page.active {
+    display: flex;
+    flex-direction: column;
+}
+#page-orders.app-page.active {
+    display: flex;
+    flex-direction: column;
+}
+/* ==================== 📢 全域頂部高質感跑馬燈公告 ==================== */
+.marquee-wrapper {
+    flex: 1;
+    max-width: 400px; /* 限制最大寬度，防止它拉得太長擠壓到名字 */
+    height: 32px;
+    background-color: #fffdfa; /* 輕柔乳白底 */
+    border: 1px solid var(--border);
+    padding: 0 15px;
+    margin-right: 20px; /* 與右邊重載按鈕拉開舒適距離 */
+    display: flex;
+    align-items: center;
+    overflow: hidden; /* 隱藏超出框框的文字 */
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(68, 62, 56, 0.03);
+
+    margin-left: 40px; 
+    margin-right: 15px;
+}
+
+
+/* ==================== 📢 全域頂部大器一整列跑馬燈公告 ==================== */
+.marquee-wrapper {
+    flex: 1; /* 讓它自動塞滿重載按鈕左邊的所有剩餘空間 */
+    height: 100%; /* 撐滿整個 navbar 的高度 */
+    background-color: transparent; /* 拔掉原本的小圓圈背景，改為透明與 navbar 融合 */
+    border: none; /* 拔掉框線 */
+    border-right: 1px solid var(--border); /* 💡 在右側加上一條細緻的垂直分隔線，與按鈕優雅隔開 */
+    padding: 0 20px;
+    margin-right: 15px; 
+    display: flex;
+    align-items: center;
+    overflow: hidden; 
+    position: relative;
+}
+
+/* 跑馬燈軌道 */
+.marquee-content {
+    display: inline-block;
+    white-space: nowrap;
+    position: absolute;
+    will-change: transform;
+    animation: marquee-slide 18s linear infinite; /* 稍微放慢一點點（18秒），整列滾動更舒服 */
+    font-size: 0.92rem; /* 稍微放大字體，讓一整列看起來更清晰 */
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* 滑鼠移上去時自動暫停 */
+.marquee-wrapper:hover .marquee-content {
+    animation-play-state: paused;
+    color: var(--primary); 
+}
+
+/* 跑馬燈滾動動畫 */
+@keyframes marquee-slide {
+    0% { transform: translateX(100%); }   
+    100% { transform: translateX(-100%); } 
+}
+
+/* 響應式微調：螢幕太小時自動隱藏 */
+@media (max-width: 768px) {
+    .marquee-wrapper { display: none !important; }
+}

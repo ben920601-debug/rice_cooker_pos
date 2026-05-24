@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>飯匙雲端POS系統 - 點餐收銀</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 💡 結帳明細彈出視窗專用樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-20px);
+            transition: transform 0.2s ease;
+            box-sizing: border-box;
+        }
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+        .modal-close {
+            background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted);
+        }
+        .checkout-summary-box {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .summary-row {
+            display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem;
+        }
+        .cash-input-group {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            margin-bottom: 15px;
+        }
+        .cash-input-row {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+        }
+        .cash-input-row label {
+            font-weight: bold; color: #16a34a; font-size: 1.1rem;
+        }
+        .cash-input-row input {
+            width: 150px; padding: 10px; border: 2px solid #16a34a; border-radius: 6px; 
+            font-size: 1.3rem; text-align: right; font-weight: bold; font-family: monospace; outline: none;
+        }
+        .change-display {
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-top: 15px; padding-top: 12px; border-top: 1px dashed #bbf7d0;
+        }
+        .change-label { font-weight: bold; font-size: 1.1rem; color: var(--text); }
+        .change-amount { font-size: 1.8rem; font-weight: 800; color: var(--danger); font-family: monospace; }
+        
+        .modal-footer {
+            display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+        }
+        .btn-cancel {
+            background: #e5e7eb; color: #374151; border: none; padding: 11px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        .btn-confirm-pay {
+            background: #10b981; color: white; border: none; padding: 11px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-confirm-pay:disabled { background: #9ca3af; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand"><i class="fa-solid fa-store"></i><span>飯匙雲端POS</span></div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active">
+                <a href="home.html"><i class="fa-solid fa-cash-register"></i><span>點餐收銀</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="orders.html"><i class="fa-solid fa-list-check"></i><span>今日訂單</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="products.html"><i class="fa-solid fa-box"></i><span>商品管理</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="staff.html"><i class="fa-solid fa-users-gear"></i><span>人事管理</span></a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <span>v1.0 MPA</span>
+            <span>電鍋工作室</span>
+            <button class="btn-logout" onclick="handleLogout()" title="登出系統並鎖定"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+            <header class="top-navbar" style="display: flex; justify-content: space-between; align-items: center; height: 60px; padding: 0 20px;">
+            <div class="page-title" style="display: flex; align-items: center; gap: 10px;">
+                <h2><i class="fa-solid fa-calculator" style="color: var(--primary);"></i> 點餐收銀</h2>
+            </div>
+
+            <div class="marquee-wrapper">
+                <div class="marquee-content" id="system-marquee">
+                    <i class="fa-solid fa-bullhorn" style="color: var(--primary); margin-right: 6px;"></i> 
+                    系統提示：資料庫為GOOGLE試算表，連線較為緩慢，請耐心等待，歡迎體驗或至IG詢問更多使用細節！@denguword1220
+                </div>
+            </div>
+
+            <div class="user-info" style="display: flex; align-items: center; gap: 12px;">
+                <button class="btn-refresh-trigger" onclick="handleManualRefresh()" title="強制同步雲端商品選單" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:1.1rem; padding:5px;"><i class="fa-solid fa-rotate"></i></button>
+                <i class="fa-solid fa-circle-user" style="color: var(--primary); font-size: 1.2rem;"></i>
+                <span id="cashier-name">收銀員：連線中</span>
+            </div>
+        </header>
+
+        <main class="page-content" style="display: flex; gap: 20px; padding: 25px; box-sizing: border-box; overflow: hidden; height: calc(100vh - 70px);">
+            
+            <div style="flex: 2; overflow-y: auto; padding-right: 5px;">
+                <div class="products-grid" id="products-container">
+                    </div>
+            </div>
+
+            <div style="flex: 1; background: white; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.01); min-width: 320px; box-sizing: border-box;">
+                <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: var(--text); font-size: 1.05rem;"><i class="fa-solid fa-basket-shopping" style="color: var(--text-muted);"></i> 結帳明細</h3>
+                    <i class="fa-solid fa-cart-flatbed-suitcases" style="color: var(--border);"></i>
+                </div>
+                
+                <div id="cart-container" style="flex: 1; overflow-y: auto; padding: 20px; box-sizing: border-box;">
+                    <div style="text-align:center; color:var(--text-muted); padding:50px 10px;">購物車空空如也</div>
+                </div>
+
+                <div style="padding: 20px; border-top: 1px solid var(--border); background: #fafafa; border-radius: 0 0 12px 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="font-weight: bold; color: var(--text-muted);">應付總計</span>
+                        <span id="cart-total" style="font-size: 1.6rem; font-weight: 800; color: var(--primary); font-family: monospace;">$0</span>
+                    </div>
+                    <button id="checkout-btn" onclick="openCheckoutModal()" disabled style="width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: background 0.2s;">
+                        <i class="fa-solid fa-cart-shopping"></i> 小計結帳
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-money-check-dollar" style="color: var(--primary);"></i> 收銀交易確認明細</h3>
+                <button class="modal-close" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="checkout-summary-box" id="checkout-summary-list">
+                </div>
+
+            <div class="cash-input-group">
+                <div class="summary-row" style="margin-bottom: 15px; border-bottom: 1px solid #bbf7d0; padding-bottom: 10px;">
+                    <span style="font-weight: bold; font-size: 1.1rem; color: var(--text);">應付總金額：</span>
+                    <span id="modal-payable-amount" style="font-size: 1.3rem; font-weight: 800; color: var(--primary); font-family: monospace;">$0</span>
+                </div>
+                
+                <div class="cash-input-row">
+                    <label for="cash-received">實收現金 (元)</label>
+                    <input type="number" id="cash-received" placeholder="0" min="0" oninput="calculateChangeDirectly()" pattern="[0-9]*" inputmode="numeric">
+                </div>
+
+                <div class="change-display">
+                    <span class="change-label">找零金額</span>
+                    <span class="change-amount" id="modal-change-amount">$0</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeCheckoutModal()">取消</button>
+                <button type="button" class="btn-confirm-pay" id="confirm-pay-btn" onclick="handleCheckoutExecute()">
+                    <i class="fa-solid fa-print"></i> 確認扣款結帳
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/pos.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>

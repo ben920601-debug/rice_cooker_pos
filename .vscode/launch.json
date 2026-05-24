@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "直接用 Chrome 開啟本地 HTML",
+            "file": "${workspaceFolder}/home.html", // 改用 file 屬性直接讀取
+            "sourceMaps": true
+        }
+    ]
+}
