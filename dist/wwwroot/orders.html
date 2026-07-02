@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>飯匙雲端POS系統 - 今日訂單</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ==================== 📊 歷史訂單看板專用優化樣式 ==================== */
+        .orders-card {
+            background: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01); 
+            width: 100%; 
+            box-sizing: border-box;
+        }
+
+        .manager-table {
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left; 
+            min-width: 750px; 
+        }
+
+        .manager-table h4 {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .scrollable-wrapper {
+            overflow-x: auto; 
+            width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand"><i class="fa-solid fa-store"></i><span>飯匙雲端POS</span></div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="/home.html"><i class="fa-solid fa-cash-register"></i><span>點餐收銀</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/orders.html"><i class="fa-solid fa-list-check"></i><span>今日訂單</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/products.html"><i class="fa-solid fa-box"></i><span>商品管理</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/staff.html"><i class="fa-solid fa-users-gear"></i><span>人事管理</span></a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <span>v1.1 後端升級版</span>
+            <span>電鍋工作室</span>
+            <button class="btn-logout" onclick="handleLogout()" title="登出系統並鎖定"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="page-title">
+                <h2><i class="fa-solid fa-list-check" style="color: var(--text-muted)"></i> 今日交易明細查詢</h2>
+            </div>
+
+            <div class="marquee-wrapper">
+                <div class="marquee-content" id="system-marquee">
+                    <i class="fa-solid fa-bullhorn" style="color: var(--primary); margin-right: 6px;"></i> 
+                    系統提示：資料庫為GOOGLE試算表，連線較為緩慢，請耐心等待，歡迎體驗或至IG詢問更多使用細節！@denguword1220
+                </div>
+            </div>
+            <div class="user-info" style="display: flex; align-items: center; gap: 15px;">
+                <button class="btn-refresh-trigger" onclick="handleManualRefresh()" title="強制同步最新雲端交易訂單" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:1.1rem; padding:5px;"><i class="fa-solid fa-rotate"></i></button>
+                <i class="fa-solid fa-circle-user" style="color: var(--primary); font-size: 1.2rem;"></i>
+                <span id="cashier-name">管理者：連線中</span>
+            </div>
+        </header>
+
+        <main class="page-content" style="padding: 30px; display: flex; flex-direction: column; width: 100%; box-sizing: border-box; overflow-y: auto;">
+            
+            <div class="orders-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--text); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-receipt" style="color: var(--text-muted);"></i> 交易明細查詢（今日）
+                    </h3>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); background: #f3f4f6; padding: 4px 10px; border-radius: 20px; font-weight: 500;">自動即時排序</span>
+                </div>
+
+                <div class="scrollable-wrapper">
+                    <table class="manager-table">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.95rem; background: #f9fafb;">
+                                <th style="padding: 14px 10px; width: 22%;">交易時間 (TW)</th>
+                                <th style="padding: 14px 10px; width: 20%;">交易單號</th>
+                                <th style="padding: 14px 10px; width: 18%;">經手收銀員</th>
+                                <th style="padding: 14px 10px; width: 25%;">購買明細摘要</th>
+                                <th style="padding: 14px 10px; width: 15%; text-align: right; padding-right: 20px;">交易總金額</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <tr>
+                                <td colspan="5" style="text-align:center; color:var(--text-muted); padding:40px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> 正在連線雲端資料庫，請稍候...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script> 
+    <script src="js/orders.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>

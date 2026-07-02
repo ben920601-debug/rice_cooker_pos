@@ -1,0 +1,14 @@
+/Users/buddy/Desktop/RicrSpoon_POS/dist/RicrSpoon_POS
+/Users/buddy/Desktop/RicrSpoon_POS/dist/RicrSpoon_POS.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/RicrSpoon_POS.runtimeconfig.json
+/Users/buddy/Desktop/RicrSpoon_POS/dist/RicrSpoon_POS.pdb
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Microsoft.EntityFrameworkCore.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Microsoft.EntityFrameworkCore.Abstractions.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Microsoft.EntityFrameworkCore.Relational.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Microsoft.OpenApi.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/MySqlConnector.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Pomelo.EntityFrameworkCore.MySql.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Swashbuckle.AspNetCore.Swagger.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/Swashbuckle.AspNetCore.SwaggerUI.dll
+/Users/buddy/Desktop/RicrSpoon_POS/dist/RicrSpoon_POS.deps.json

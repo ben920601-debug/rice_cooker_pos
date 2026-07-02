@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>飯匙雲端POS系統 - 人事管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ==================== 🗳️ 彈出視窗 (Modal) 完美排版樣式 ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-20px);
+            transition: transform 0.2s ease;
+            box-sizing: border-box;
+        }
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-close {
+            background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--danger); }
+        
+        /* Modal 內部輸入框間距優化 */
+        .modal-card .input-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .modal-card .input-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .modal-card .input-group input, 
+        .modal-card .input-group select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            outline: none;
+            background: white;
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+        .modal-card .input-group input:focus,
+        .modal-card .input-group select:focus {
+            border-color: var(--primary);
+        }
+        .modal-footer {
+            display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 15px;
+        }
+        .btn-cancel {
+            background: #f3f4f6; color: #4b5563; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #e5e7eb; }
+        .btn-save {
+            background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; transition: background 0.2s;
+        }
+        .btn-save:hover { background: #059669; }
+        .btn-save:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        /* ==================== 🛠️ 後台大畫面排版優化 ==================== */
+        .page-toolbar {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            width: 100%; 
+            box-sizing: border-box;
+        }
+        .page-title-area {
+            display: flex; align-items: center; gap: 10px; color: var(--text);
+        }
+        .page-title-area h3 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+        
+        .btn-add-trigger {
+            background: var(--primary); color: white; border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; transition: background 0.2s; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+        .btn-add-trigger:hover { background: #059669; }
+
+        /* 人事表格狀態專用 Badge 視覺樣式 */
+        .badge {
+            padding: 5px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-block;
+        }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        .badge-success { background: #e0f2fe; color: #0369a1; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand"><i class="fa-solid fa-store"></i><span>飯匙雲端POS</span></div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="/home.html"><i class="fa-solid fa-cash-register"></i><span>點餐收銀</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/orders.html"><i class="fa-solid fa-list-check"></i><span>今日訂單</span></a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/products.html"><i class="fa-solid fa-box"></i><span>商品管理</span></a>
+            </li>
+            <li class="sidebar-item active">
+                <a href="/staff.html"><i class="fa-solid fa-users-gear"></i><span>人事管理</span></a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <span>v1.1 後端升級版/span>
+            <span>電鍋工作室</span>
+            <button class="btn-logout" onclick="handleLogout()" title="登出系統並鎖定"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="page-title">
+                <h2 style="font-size: 1.2rem;"><i class="fa-solid fa-users-gear" style="color: var(--text-muted)"></i> 門市人事管理</h2>
+            </div>
+
+            <div class="marquee-wrapper">
+                <div class="marquee-content" id="system-marquee">
+                    <i class="fa-solid fa-bullhorn" style="color: var(--primary); margin-right: 6px;"></i> 
+                    系統提示：資料庫為GOOGLE試算表，連線較為緩慢，請耐心等待，歡迎體驗或至IG詢問更多使用細節！@denguword1220
+                </div>
+            </div>
+            <div class="user-info" style="display: flex; align-items: center; gap: 15px;">
+                <button class="btn-refresh-trigger" onclick="handleManualRefresh()" title="強制同步最新雲端人事名冊" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:1.1rem; padding:5px;"><i class="fa-solid fa-rotate"></i></button>
+                <i class="fa-solid fa-circle-user" style="color: var(--primary); font-size: 1.2rem;"></i>
+                <span id="cashier-name">管理者：連線中</span>
+            </div>
+        </header>
+
+        <main class="page-content" style="padding: 30px; display: flex; flex-direction: column; width: 100%; box-sizing: border-box; overflow-y: auto;">
+            
+            <div class="page-toolbar">
+                <div class="page-title-area">
+                    <h3><i class="fa-solid fa-address-book" style="color:var(--text-muted)"></i> 員工資料</h3>
+                </div>
+                <button class="btn-add-trigger" onclick="openAddModal()">
+                    <i class="fa-solid fa-user-plus"></i> 新增員工帳號
+                </button>
+            </div>
+
+            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.01); width: 100%; box-sizing: border-box;">
+                <div style="overflow-x: auto; width: 100%;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 650px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.95rem; background: #f9fafb;">
+                                <th style="padding: 14px 12px; width: 15%;">員工編號</th>
+                                <th style="padding: 14px 12px; width: 25%;">員工姓名</th>
+                                <th style="padding: 14px 12px; width: 20%;">職稱權限</th>
+                                <th style="padding: 14px 12px; width: 15%;">登入密碼</th>
+                                <th style="padding: 14px 12px; width: 25%; text-align: center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table-body">
+                            <tr>
+                                <td colspan="5" style="text-align:center; color:var(--text-muted); padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i> 正在讀取雲端人事資料...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title"><i class="fa-solid fa-user-plus" style="color: var(--primary);"></i> 新增員工權限</h3>
+                <button class="modal-close" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="staffForm">
+                <div class="input-group">
+                    <label>員工代碼/帳號</label>
+                    <input type="text" id="staff-code" placeholder="例如: A01" required 
+                           style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.95rem; background: #fffdfa; color: var(--text);">
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>員工姓名</label>
+                    <input type="text" id="staff-name" placeholder="例如: 王大明" required
+                           style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.95rem; background: #fffdfa; color: var(--text);">
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>職稱權限</label>
+                    <select id="staff-role" required
+                            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.95rem; background: #fffdfa; color: var(--text); outline: none;">
+                        <option value="店員">店員</option>
+                        <option value="店長">店長</option>
+                    </select>
+                </div>
+
+                <div class="input-group" style="margin-top: 15px; margin-bottom: 25px;">
+                    <label>系統安全密碼</label>
+                    <input type="text" id="staff-password" placeholder="請設定純數字登入密碼" required
+                           style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.95rem; background: #fffdfa; color: var(--text);">
+                </div>
+
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn-cancel" onclick="closeAddModal()">取消</button>
+                    <button type="button" class="btn-confirm-pay" id="staff-submit-btn" onclick="submitStaffFormAction()" style="background: var(--primary);">
+                        <i class="fa-solid fa-check"></i> 確認
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> 編輯員工權限資料</h3>
+                <button class="modal-close" onclick="closeEditModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="editStaffForm" onsubmit="handleUpdateStaff(event)">
+                <div class="input-group">
+                    <label>員工編號 (不可修改)</label>
+                    <input type="text" id="edit-staff-code" readonly style="background:#f3f4f6; color:var(--text-muted); font-weight:bold;">
+                </div>
+                <div class="input-group">
+                    <label>員工姓名</label>
+                    <input type="text" id="edit-staff-name" required>
+                </div>
+                <div class="input-group">
+                    <label>職稱權限</label>
+                    <select id="edit-staff-role" required>
+                        <option value="店員">店員</option>
+                        <option value="店長">店長</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>修改登入密碼</label>
+                    <input type="password" id="edit-staff-password" required pattern="[0-9]*" inputmode="numeric">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">取消</button>
+                    <button type="submit" class="btn-save" id="save-staff-btn">儲存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script> 
+    <script src="js/ui.js"></script>
+    <script src="js/staff.js"></script>
+</body>
+</html>
